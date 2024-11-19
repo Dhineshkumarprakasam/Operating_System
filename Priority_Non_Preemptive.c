@@ -1,101 +1,59 @@
+
 #include <stdio.h>
-#include <stdlib.h>
 
-typedef struct {
-    int job;
-    int at;
-    int bt;
-    int priority;
-    int ft;
-    int tat;
-    int wat;
-} Process;
+int main()
+{
+    int n,at[10],bt[10],x[10],ct[10],tat[10],wt[10],pr[10],count=0,time=0,end=0,highest;
 
-void calculate_priority_non_preemptive_scheduling(Process processes[], int num_processes) {
-    int current_time = 0;
-    int total_tat = 0;
-    int total_wat = 0;
-    int completed_processes = 0;
-    int remaining_bt[num_processes];
+    printf("Enter n : ");
+    scanf("%d",&n);
 
-    // Initialize remaining burst times
-    for (int i = 0; i < num_processes; i++) {
-        remaining_bt[i] = processes[i].bt;
-    }
+    printf("Enter at : ");
+    for(int i=0;i<n;i++)
+        scanf("%d",&at[i]);
 
-    while (completed_processes < num_processes) {
-        // Find the process with the highest priority that has arrived and not completed
-        int max_priority_index = -1;
-        int max_priority = -1;
-        for (int j = 0; j < num_processes; j++) {
-            if (processes[j].at <= current_time && remaining_bt[j] > 0 && processes[j].priority > max_priority) {
-                max_priority = processes[j].priority;
-                max_priority_index = j;
-            }
+    printf("Enter bt : ");
+    for(int i=0;i<n;i++)
+        scanf("%d",&bt[i]);
+
+    printf("Enter pr : ");
+    for(int i=0;i<n;i++)
+        scanf("%d",&pr[i]);
+
+    for(int i=0;i<n;i++)
+        x[i]=bt[i];
+
+    for(time=0;count!=n;time++)
+    {
+        highest=-1;
+        for(int i=0;i<n;i++)
+        {
+            if(at[i]<=time && (highest==-1 || pr[i]>pr[highest]) && bt[i]>0)
+                highest=i;
         }
 
-        if (max_priority_index == -1) {
-            current_time++;
-            continue;
+        if(highest!=-1)
+        {
+            time+=bt[highest]-1;
+            bt[highest]=0;
         }
 
-        // Execute the process with the highest priority until it completes
-        while (remaining_bt[max_priority_index] > 0) {
-            remaining_bt[max_priority_index]--;
-            current_time++;
+        if(bt[highest]==0)
+        {
+            count++;
+            end=time+1;
+            ct[highest]=end;
+            tat[highest]=end-at[highest];
+            wt[highest]=end-at[highest]-x[highest];
         }
-
-        processes[max_priority_index].ft = current_time;
-        processes[max_priority_index].tat = processes[max_priority_index].ft - processes[max_priority_index].at;
-        processes[max_priority_index].wat = processes[max_priority_index].tat - processes[max_priority_index].bt;
-        total_tat += processes[max_priority_index].tat;
-        total_wat += processes[max_priority_index].wat;
-        completed_processes++;
     }
 
-    // Printing output table
-    printf("\nJob | Arrival Time | Burst Time | Priority | Finish Time | Turnaround Time | Waiting Time\n");
-    printf("-------------------------------------------------------------------------------------------\n");
-    for (int i = 0; i < num_processes; i++) {
-        printf("%-3d | %-12d | %-10d | %-8d | %-11d | %-15d | %-12d\n",
-               processes[i].job,
-               processes[i].at,
-               processes[i].bt,
-               processes[i].priority,
-               processes[i].ft,
-               processes[i].tat,
-               processes[i].wat);
+    printf("\t pid \t at \t bt \t ct \t tat \t wt");
+    printf("\n-----------------------------------------------------------------");
+
+    for(int i=0;i<n;i++)
+    {
+        printf("\n\t %d \t %d \t %d \t %d \t %d \t %d",i+1,at[i],x[i],ct[i],tat[i],wt[i]);
     }
 
-    // Calculating and printing average wait time and turnaround time
-    printf("\nAverage Turnaround Time: %.2f\n", (float)total_tat / num_processes);
-    printf("Average Waiting Time: %.2f\n", (float)total_wat / num_processes);
-}
-
-int main() {
-    int num_processes;
-    printf("Enter the number of processes: ");
-    scanf("%d", &num_processes);
-
-    Process processes[num_processes];
-
-    printf("\nEnter arrival time, burst time, and priority for each process:\n");
-    for (int i = 0; i < num_processes; i++) {
-        printf("Process %d:\n", i + 1);
-        printf("Arrival Time: ");
-        scanf("%d", &processes[i].at);
-        printf("Burst Time: ");
-        scanf("%d", &processes[i].bt);
-        printf("Priority: ");
-        scanf("%d", &processes[i].priority);
-        processes[i].job = i + 1;
-        processes[i].ft = 0;
-        processes[i].tat = 0;
-        processes[i].wat = 0;
-        printf("\n");
-    }
-
-    calculate_priority_non_preemptive_scheduling(processes, num_processes);
-
-    return 0;
 }
